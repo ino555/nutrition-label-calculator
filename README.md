@@ -1,63 +1,59 @@
 # nutrition-label-calculator
 
-A Claude Code skill that calculates **Turkish-format nutrition labels (BESIN DEĞERLERİ)** from food recipes using real data from the [USDA FoodData Central](https://fdc.nal.usda.gov/) API.
+A Claude Code skill that calculates **EU/Turkish-format nutrition labels** from food recipes using real data from the [USDA FoodData Central](https://fdc.nal.usda.gov/) API.
 
-Just describe your recipe to Claude — it handles ingredient matching, weighted calculations, serving-size scaling, and formats everything to Turkish Food Codex (Türk Gıda Kodeksi) standards.
+Describe your recipe — Claude handles ingredient matching, weighted calculations, serving-size scaling, and formats everything according to Turkish Food Codex (Türk Gıda Kodeksi) standards.
 
 ---
 
-## What it does
+## Features
 
 - Accepts recipes as **ingredient percentages or grams**
-- Looks up each ingredient in the USDA FoodData Central database
-- Calculates all **9 mandatory EU/TR label nutrients**: Enerji (kJ + kcal), Yağ, Doymuş yağ, Karbonhidrat, Şekerler, Lif, Protein, Tuz
-- Outputs a **7-section report** including: recipe validation, USDA source matching table, weighted breakdown, energy check, Turkish label, warnings, and disclaimer
-- Adds **serving-size column** only when you explicitly specify a portion size
-- Flags allergens, claim eligibility (yüksek lif, protein kaynağı…), and high-salt warnings
+- Looks up each ingredient in the USDA FoodData Central database (Foundation and SR Legacy data)
+- Calculates all **9 mandatory EU/TR label nutrients**: Energy (kJ + kcal), Fat, Saturated fat, Carbohydrate, Sugars, Fibre, Protein, Salt
+- Produces a **7-section structured report**: recipe validation, USDA source table, weighted breakdown, serving-size table, energy check, formatted label, and warnings
+- Shows a **serving-size column only when you explicitly specify a portion** — never invents one
+- Flags allergens, claim eligibility (high fibre, source of protein…), and high-salt warnings
 - Appends a mandatory disclaimer reminding that lab analysis is required for commercial labels
 
 ---
 
 ## Requirements
 
-- [Claude Code](https://claude.ai/code) (desktop or CLI)
+- [Claude Code](https://claude.ai/code) (desktop app or CLI)
 - Python 3.10+
-- A free USDA FoodData Central API key → [Get one here](https://fdc.nal.usda.gov/api-guide.html)
+- A free USDA FoodData Central API key → [get one here](https://fdc.nal.usda.gov/api-guide.html)
 
 ---
 
 ## Installation
 
-### 1. Install the skill in Claude Code
-
-**Option A — .skill file (easiest)**
-
-Download [`nutrition-label-calculator.skill`](https://github.com/YOUR_USERNAME/nutrition-label-calculator/releases) and install it from Claude Code's plugin manager.
-
-**Option B — Manual**
-
-Clone this repo into your Claude skills directory:
+### 1. Clone the skill
 
 ```bash
 # macOS / Linux
-git clone https://github.com/YOUR_USERNAME/nutrition-label-calculator \
-  ~/.claude/plugins/local/nutrition-label-calculator
+git clone https://github.com/ino555/nutrition-label-calculator \
+  ~/.claude/skills/nutrition-label-calculator
 
 # Windows (PowerShell)
-git clone https://github.com/YOUR_USERNAME/nutrition-label-calculator `
-  "$env:USERPROFILE\.claude\plugins\local\nutrition-label-calculator"
+git clone https://github.com/ino555/nutrition-label-calculator `
+  "$env:USERPROFILE\.claude\skills\nutrition-label-calculator"
 ```
 
-### 2. Get your USDA API key (free, instant)
+Or download and extract the zip, then place the folder at:
+- **macOS/Linux:** `~/.claude/skills/nutrition-label-calculator/`
+- **Windows:** `%USERPROFILE%\.claude\skills\nutrition-label-calculator\`
+
+### 2. Get a free USDA API key
 
 1. Go to **https://fdc.nal.usda.gov/api-guide.html**
 2. Click **"Get an API Key"**
-3. Enter your name and email — the key arrives in the same page immediately
-4. Copy the key (it looks like: `AbCdEfGhIjKlMnOpQrStUvWxYz123456`)
+3. Enter your name and email — the key is shown immediately on the same page
+4. Copy it (looks like: `AbCdEfGhIjKlMnOpQrStUvWxYz123456`)
 
 ### 3. Add the key to Claude Code
 
-Create or edit `.claude/settings.local.json` in your project directory:
+Create or edit `.claude/settings.local.json` in your **project directory**:
 
 ```json
 {
@@ -67,71 +63,62 @@ Create or edit `.claude/settings.local.json` in your project directory:
 }
 ```
 
-> **This file is already in `.gitignore` — it will never be committed.** Do not add the key anywhere else.
+> **This file is already in `.gitignore`** — it will never be committed. Never put the key anywhere else.
 
-#### Alternative: System environment variable
+**Alternative — permanent system environment variable:**
 
-**Windows PowerShell** (permanent, survives restarts):
+Windows PowerShell:
 ```powershell
 [System.Environment]::SetEnvironmentVariable("FDC_API_KEY", "YOUR_KEY", "User")
 ```
 
-**macOS / Linux** (add to `~/.zshrc` or `~/.bashrc`):
+macOS / Linux (add to `~/.zshrc` or `~/.bashrc`, then `source ~/.zshrc`):
 ```bash
 export FDC_API_KEY="YOUR_KEY"
 ```
-Then reload: `source ~/.zshrc`
+
+### 4. Restart Claude Code
+
+Close and reopen Claude Code. The skill loads automatically — no further setup needed.
 
 ---
 
 ## Usage
 
-Once the skill is installed and the key is set, just describe your recipe to Claude:
+Once installed, describe your recipe in plain language:
 
-### Percentage input
-
+### Percentage input (no serving size)
 ```
-Bir atıştırmalık bar için besin etiketi hesapla:
-- Antep fıstığı: %40
-- Hindistan cevizi unu: %20
-- Hurma: %25
-- Kakao tozu: %10
-- Hindistan cevizi yağı: %5
-```
-
-### Gram input
-
-```
-Besin değerlerini hesapla, porsiyon: 25g
-- Badem: 50g
-- Fındık: 30g
-- Kakao tozu: 15g
-- Tuz: 5g
+Calculate the nutrition label for my snack bar:
+- Pistachio nuts: 40%
+- Coconut flour: 20%
+- Medjool dates: 25%
+- Cocoa powder (unsweetened): 10%
+- Coconut oil: 5%
 ```
 
-### With serving size
-
+### Gram input with serving size
 ```
-Antep fıstıklı bar besin değerleri. Porsiyon: 35g
-- Antep fıstığı %40 ...
+Calculate nutrition values, serving size 25g:
+- Almonds: 50g
+- Hazelnuts: 30g
+- Cocoa powder: 15g
+- Salt: 5g
 ```
 
 ### Using the Python script directly
 
 ```bash
-# Set your key first
-export FDC_API_KEY="your_key_here"   # or use .env
-
-# Run with a JSON recipe file
+# With a JSON recipe file
 PYTHONUTF8=1 python scripts/nutrition_calculator.py examples/example_recipe.json
 
-# Or pipe JSON directly
+# Or pipe JSON
 echo '{
-  "product_name": "Test Ürünü",
-  "serving_size_g": 30,
+  "product_name": "Almond Cocoa Mix",
+  "serving_size_g": 25,
   "ingredients": [
-    {"name": "Badem", "search_term": "almonds raw", "percentage": 60},
-    {"name": "Kakao", "search_term": "cocoa powder unsweetened", "percentage": 40}
+    {"name": "Almonds",      "search_term": "almonds raw",              "percentage": 60},
+    {"name": "Cocoa powder", "search_term": "cocoa powder unsweetened", "percentage": 40}
   ]
 }' | PYTHONUTF8=1 python scripts/nutrition_calculator.py
 ```
@@ -140,16 +127,16 @@ echo '{
 
 ```json
 {
-  "product_name": "Ürün Adı",
+  "product_name": "Product Name",
   "serving_size_g": 25,
   "ingredients": [
     {
-      "name": "Badem",
+      "name": "Almonds",
       "search_term": "almonds raw",
       "percentage": 50
     },
     {
-      "name": "Kakao tozu",
+      "name": "Cocoa powder",
       "search_term": "cocoa powder unsweetened",
       "grams": 15
     }
@@ -157,66 +144,77 @@ echo '{
 }
 ```
 
-Use either `"percentage"` or `"grams"` per ingredient — the script converts grams to percentages automatically if `"grams"` is used.
+Use either `"percentage"` or `"grams"` per ingredient — the script converts grams to percentages automatically when the total is provided.
 
 ---
 
-## Example output
+## Output format
+
+The skill always produces 7 sections:
+
+| Section | Contents |
+|---------|----------|
+| 1 — Recipe check | Ingredient table, gram→% conversion if needed, total validation |
+| 2 — Ingredient matching | USDA source, FDC ID, data type, confidence score per ingredient |
+| 3 — Per-100g breakdown | Weighted contribution of each ingredient to all 9 nutrients |
+| 4 — Serving-size table | 100g vs. serving columns — only shown when serving size is specified |
+| 5 — Energy check | API kcal vs. macro-calculated kcal; flags discrepancies > 10 kcal |
+| 6 — Nutrition label | Ready-to-read label in EU/TR format with Turkish decimal commas |
+| 7 — Warnings & disclaimer | Allergens, claim eligibility, high-salt notice, mandatory disclaimer |
+
+Example label output:
 
 ```
-BESIN DEĞERLERİ
+NUTRITION FACTS / BESIN DEGERLERİ
 
-100 g için:
-Enerji: 2257 kJ / 539 kcal
-Yağ: 43,6 g
-  - Doymuş yağ asitleri: 3,1 g
-Karbonhidrat: 26,7 g
-  - Şekerler: 0,3 g
-Lif: 13,5 g
-Protein: 17,7 g
-Tuz: 4,85 g
+Per 100 g:
+Energy:                     2257 kJ / 539 kcal
+Fat:                              43.6 g
+  - Saturated fatty acids:         3.1 g
+Carbohydrate:                     26.7 g
+  - Sugars:                         0.3 g
+Fibre:                            13.5 g
+Protein:                          17.7 g
+Salt:                              4.85 g
 
-25 g porsiyon için (kullanıcı tarafından belirtildi):
-Enerji: 564 kJ / 135 kcal
-Yağ: 10,9 g
-  ...
+Per 25 g serving (as specified):
+Energy:                      564 kJ / 135 kcal
+...
 ```
-
-Full output includes 7 sections: recipe validation, USDA source table, weighted breakdown, serving table, energy check, Turkish label, and warnings/disclaimer.
 
 ---
 
-## Security
+## API key security
 
-| Do | Don't |
-|----|-------|
-| Store key in `.claude/settings.local.json` | Hardcode key in any `.py` or `.md` file |
-| Add `.env` and `settings.local.json` to `.gitignore` | Commit `.env` or `settings.local.json` |
-| Use environment variables | Share your key in chat, issues, or PRs |
+| Do | Do not |
+|----|--------|
+| Store the key in `.claude/settings.local.json` | Hardcode the key in any `.py` or `.md` file |
+| Verify `.env` and `settings.local.json` are in `.gitignore` | Commit `.env` or `settings.local.json` to git |
+| Use a system environment variable as an alternative | Share your key in chat messages, issues, or pull requests |
 
 **If you accidentally commit your key:**
 1. Revoke it immediately at https://fdc.nal.usda.gov
 2. Request a new key
-3. Remove it from git history (use [BFG Repo Cleaner](https://rtyley.github.io/bfg-repo-cleaner/))
-4. Verify `.gitignore` covers the file before re-committing
+3. Remove it from git history with [BFG Repo Cleaner](https://rtyley.github.io/bfg-repo-cleaner/)
+4. Confirm `.gitignore` covers the file before pushing again
 
 ---
 
-## Nutrient sources
+## Nutrient data sources
 
-All values come from [USDA FoodData Central](https://fdc.nal.usda.gov/). Priority order: **Foundation** > **SR Legacy** > **Survey (FNDDS)**. Branded/manufacturer data is not used.
+All values come from [USDA FoodData Central](https://fdc.nal.usda.gov/). Data type priority: **Foundation** > **SR Legacy** > **Survey (FNDDS)**. Branded/manufacturer data is never used.
 
-Salt is derived from sodium: `salt_g = sodium_mg / 1000 × 2.5`
+Key conversions:
+- **Salt from sodium:** `salt_g = sodium_mg / 1000 × 2.5`
+- **Energy in kJ:** `kJ = kcal × 4.184`
 
-Energy in kJ: `kJ = kcal × 4.184`
-
-See [`references/nutrient-mapping.md`](references/nutrient-mapping.md) for the full nutrient ID table and Turkish → USDA search term mapping.
+See [`references/nutrient-mapping.md`](references/nutrient-mapping.md) for the full USDA nutrient ID table and ingredient search-term mapping.
 
 ---
 
 ## Disclaimer
 
-This tool produces **preliminary estimates** based on USDA database values. For commercial food labeling in Turkey, **accredited laboratory analysis is legally required** (Türk Gıda Kodeksi Etiketleme Yönetmeliği, Madde 8). This output does not constitute a legal nutrition label.
+This tool produces **preliminary estimates** based on USDA database values. For commercial food labeling in Turkey, **accredited laboratory analysis is legally required** (Turkish Food Codex Labelling Regulation, Article 8). This output does not constitute an official or legally binding nutrition label.
 
 ---
 
