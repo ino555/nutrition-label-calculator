@@ -1,0 +1,117 @@
+{
+  "skill_name": "nutrition-label-calculator",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Bir atıştırmalık bar reçetem var, besin etiketi hesapla:\n- Antep fıstığı: %40\n- Hindistan cevizi unu: %20\n- Hurma (kuru): %25\n- Kakao tozu (şekersiz): %10\n- Hindistan cevizi yağı: %5",
+      "expected_output": "7-section Turkish nutrition label with BESIN DEĞERLERİ header, 100g values for all 9 nutrients, matching table with USDA sources, energy check, and disclaimer. No serving size section since none was specified.",
+      "files": [],
+      "assertions": [
+        {
+          "name": "contains_besin_degerleri_header",
+          "description": "Output contains 'BESIN' in the label section (Turkish header)"
+        },
+        {
+          "name": "contains_100g_label",
+          "description": "Output contains '100 g' reference (standard per-100g labeling)"
+        },
+        {
+          "name": "contains_kj_and_kcal",
+          "description": "Energy shown in both kJ and kcal"
+        },
+        {
+          "name": "contains_all_9_nutrients",
+          "description": "All 9 mandatory nutrients present: enerji, yağ, doymuş yağ, karbonhidrat, şeker, lif, protein, tuz"
+        },
+        {
+          "name": "contains_matching_table",
+          "description": "Output includes USDA ingredient matching table with FDC IDs"
+        },
+        {
+          "name": "no_serving_size_section",
+          "description": "Since no serving size was given, output should NOT contain a per-serving column or section"
+        },
+        {
+          "name": "contains_disclaimer",
+          "description": "Output contains the mandatory disclaimer about laboratory analysis requirement"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Antep fıstıklı bar besin değerlerini hesapla. Porsiyon: 35g\n\nReçete:\n- Antep fıstığı: %40\n- Hindistan cevizi unu: %20\n- Hurma: %25\n- Kakao tozu: %10\n- Hindistan cevizi yağı: %5",
+      "expected_output": "7-section output including both 100g and 35g serving columns. Kakao must match 'cocoa powder unsweetened' not a beverage mix.",
+      "files": [],
+      "assertions": [
+        {
+          "name": "contains_besin_degerleri_header",
+          "description": "Output contains 'BESIN' in the label section"
+        },
+        {
+          "name": "contains_100g_label",
+          "description": "Output contains '100 g' reference"
+        },
+        {
+          "name": "contains_serving_size_35g",
+          "description": "Output contains '35 g' serving size values"
+        },
+        {
+          "name": "contains_kj_and_kcal",
+          "description": "Energy shown in both kJ and kcal"
+        },
+        {
+          "name": "contains_all_9_nutrients",
+          "description": "All 9 mandatory nutrients present"
+        },
+        {
+          "name": "contains_matching_table",
+          "description": "Output includes USDA ingredient matching table"
+        },
+        {
+          "name": "cocoa_correct_match",
+          "description": "Kakao matched to 'cocoa powder unsweetened' or 'cocoa dry powder' — NOT a beverage mix"
+        },
+        {
+          "name": "contains_disclaimer",
+          "description": "Output contains mandatory disclaimer"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "Aşağıdaki reçetenin besin değerlerini hesapla. Porsiyon: 25g\n\nMalzemeler (gram cinsinden):\n- Badem: 50g\n- Fındık: 30g\n- Kakao tozu: 15g\n- Tuz: 5g",
+      "expected_output": "Gram→percentage conversion (50%/30%/15%/5%), then full 7-section output with both 100g and 25g serving.",
+      "files": [],
+      "assertions": [
+        {
+          "name": "contains_besin_degerleri_header",
+          "description": "Output contains 'BESIN' in the label section"
+        },
+        {
+          "name": "shows_gram_to_percent_conversion",
+          "description": "Output shows gram-to-percentage conversion: 50g→50%, 30g→30%, 15g→15%, 5g→5%"
+        },
+        {
+          "name": "contains_100g_label",
+          "description": "Output contains '100 g' reference"
+        },
+        {
+          "name": "contains_serving_size_25g",
+          "description": "Output contains '25 g' serving size"
+        },
+        {
+          "name": "contains_kj_and_kcal",
+          "description": "Energy shown in both kJ and kcal"
+        },
+        {
+          "name": "contains_all_9_nutrients",
+          "description": "All 9 mandatory nutrients present"
+        },
+        {
+          "name": "contains_disclaimer",
+          "description": "Output contains mandatory disclaimer"
+        }
+      ]
+    }
+  ]
+}

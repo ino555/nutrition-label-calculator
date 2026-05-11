@@ -1,0 +1,10 @@
+{
+  "product_name": "Karışık Kuruyemiş ve Kakao",
+  "serving_size_g": 25,
+  "ingredients": [
+    {"name": "Badem", "search_term": "almonds raw", "grams": 50},
+    {"name": "Fındık", "search_term": "hazelnuts raw", "grams": 30},
+    {"name": "Kakao tozu", "search_term": "cocoa powder unsweetened", "grams": 15},
+    {"name": "Tuz", "search_term": "salt table", "grams": 5}
+  ]
+}
